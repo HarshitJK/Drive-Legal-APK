@@ -1,1 +1,22 @@
-{}
+{
+  "speeding": ["speeding", "speed", "limit", "fast", "racing", "section 183", "over speed", "overspeed"],
+  "helmet": ["helmet", "headgear", "two wheeler", "two-wheeler", "bike", "section 129", "pillion", "isi"],
+  "drunk_driving": ["drunk", "alcohol", "dui", "drink", "bac", "breath", "section 185", "intoxicated", "driving under influence"],
+  "mobile_phone": ["mobile", "phone", "cell", "calling", "texting", "section 184", "whatsapp", "smartphone"],
+  "no_insurance": ["insurance", "insured", "third party", "section 196", "policy", "uninsured"],
+  "no_license": ["license", "licence", "dl", "driving licence", "section 181", "section 3", "learner", "ll"],
+  "no_puc": ["puc", "pollution", "emission", "section 190", "certificate", "bs6", "smog"],
+  "seatbelt": ["seatbelt", "seat belt", "section 194b", "belt", "safety belt", "child seat"],
+  "red_light": ["red light", "signal", "jump", "atcc", "section 119", "section 177", "traffic light"],
+  "triple_riding": ["triple", "three", "pillion", "section 128", "overload", "two wheeler"],
+  "wrong_side": ["wrong side", "one way", "reverse", "section 184", "opposite", "divider"],
+  "juvenile_driving": ["juvenile", "minor", "child", "section 199a", "underage", "under 18", "teenager"],
+  "state_tamil_nadu": ["tamil", "tamil nadu", "tn", "chennai", "coimbatore", "madurai"],
+  "state_delhi": ["delhi", "dl", "new delhi", "ncr", "noida", "gurgaon"],
+  "state_maharashtra": ["maharashtra", "mh", "mumbai", "pune", "nagpur", "thane"],
+  "state_karnataka": ["karnataka", "ka", "bangalore", "bengaluru", "mysore", "hubli"],
+  "state_gujarat": ["gujarat", "gj", "ahmedabad", "surat", "vadodara", "rajkot"],
+  "state_kerala": ["kerala", "kl", "kochi", "thiruvananthapuram", "kozhikode", "malappuram"],
+  "state_telangana": ["telangana", "ts", "hyderabad", "warangal", "nizamabad"],
+  "state_west_bengal": ["west bengal", "wb", "kolkata", "calcutta", "howrah", "siliguri"]
+}

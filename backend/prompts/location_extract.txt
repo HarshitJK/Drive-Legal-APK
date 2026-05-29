@@ -1,0 +1,22 @@
+Extract the Indian state and city from the user message.
+Return ONLY a valid JSON object — no prose, no markdown fences.
+
+{{
+  "state": "<full state name in English, or null>",
+  "city": "<city name in English, or null>"
+}}
+
+Rules:
+- Use the official state name (e.g. "Tamil Nadu", not "TN").
+- If the message mentions a city but not a state, infer the state.
+- If the message is ambiguous or no location is mentioned, return null for both fields.
+- Do not include country name in the state field.
+
+Examples:
+"I'm in Chennai"             → {{"state": "Tamil Nadu", "city": "Chennai"}}
+"Mumbai"                     → {{"state": "Maharashtra", "city": "Mumbai"}}
+"I got a challan in Bangalore" → {{"state": "Karnataka", "city": "Bangalore"}}
+"Delhi NCR"                  → {{"state": "Delhi", "city": "Delhi"}}
+"Hyderabad"                  → {{"state": "Telangana", "city": "Hyderabad"}}
+"I live near Kochi"          → {{"state": "Kerala", "city": "Kochi"}}
+"hello"                      → {{"state": null, "city": null}}
