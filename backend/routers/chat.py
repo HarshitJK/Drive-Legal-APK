@@ -38,7 +38,8 @@ async def chat(req: ChatRequest, request: Request):
     # ── Override from request (web/mobile direct params) ─────────────────────
     if req.language and req.language != session.language:
         session.language = req.language
-        session.onboarding_step = "location" if not session.state else "done"
+        if session.onboarding_step == "language":
+            session.onboarding_step = "location" if not session.state else "done"
     if req.state:
         session.state = req.state
         if session.onboarding_step == "location":

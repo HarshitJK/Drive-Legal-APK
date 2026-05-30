@@ -1,6 +1,7 @@
 import json
 import asyncio
 import httpx
+from urllib.parse import quote, unquote
 from models.session import SessionState, Turn
 from config import settings
 
@@ -30,7 +31,7 @@ async def _redis_get(key: str) -> str | None:
                 return None
             # Upstash wraps the stored string — decode if double-encoded
             if isinstance(result, str):
-                return result
+                return unquote(result)
             return json.dumps(result)
     except Exception:
         return _local_store.get(key)
@@ -41,10 +42,12 @@ async def _redis_set(key: str, value: str, ttl: int):
         _local_store[key] = value
         return
     try:
+        # URL-encode the value for the REST path
+        safe_value = quote(value)
         async with httpx.AsyncClient(timeout=5) as client:
             # Upstash REST: POST /set/KEY/VALUE with optional EX query param
             await client.post(
-                f"{REDIS_URL}/set/{key}/{value}?EX={ttl}",
+                f"{REDIS_URL}/set/{key}/{safe_value}?EX={ttl}",
                 headers={"Authorization": f"Bearer {REDIS_TOKEN}"}
             )
     except Exception:
@@ -64,11 +67,9 @@ async def get_session(session_id: str) -> SessionState:
 
 async def save_session(state: SessionState):
     serialized = state.model_dump_json()
-    # URL-encode the JSON value to avoid issues with special chars in path
-    encoded = serialized.replace("/", "%2F").replace(" ", "%20")
     await _redis_set(
         f"session:{state.session_id}",
-        encoded,
+        serialized,
         settings.SESSION_TTL_SECONDS,
     )
 

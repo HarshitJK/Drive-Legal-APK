@@ -50,7 +50,10 @@ export interface LocationResponse {
   country: string;
 }
 
-const BASE_URL = "/api"; // proxied by Vite to localhost:8000
+// In development, Vite proxies /api → localhost:8000
+// In production (Capacitor mobile), we must use the real backend URL
+const PROD_API_URL = import.meta.env.VITE_API_URL ?? "http://10.0.2.2:8000";
+const BASE_URL = import.meta.env.DEV ? "/api" : PROD_API_URL;
 
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const res = await fetch(`${BASE_URL}${path}`, {

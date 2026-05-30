@@ -9,6 +9,45 @@ GROQ_URL        = "https://api.groq.com/openai/v1/chat/completions"
 OPENROUTER_URL  = "https://openrouter.ai/api/v1/chat/completions"
 XAI_URL         = "https://api.x.ai/v1/chat/completions"
 
+# ── Thinking / reasoning leak stripper ───────────────────────────────────────
+# Some models (Nemotron, DeepSeek-R1, QwQ, etc.) emit their chain-of-thought
+# either inside <think>...</think> tags or as plain prose before the answer.
+# This function removes all of that so only the final answer is returned.
+
+_REASONING_PREFIXES = (
+    "we need to", "the user asked", "let me think", "let's think",
+    "i need to", "i should", "according to rules", "according to the",
+    "we should", "we can", "we'll", "we will", "we are", "we must",
+    "so we", "now we", "first,", "step 1", "step 2",
+    "okay,", "ok,", "alright,", "sure,",
+    "the question is", "the user is", "the user says", "the user wants",
+    "this is a", "this is not", "this means", "that means",
+    "from wiki", "from the wiki", "from context",
+    "so the answer", "so i will", "so i'll",
+)
+
+
+def _strip_thinking(text: str) -> str:
+    """Remove reasoning leakage from LLM output."""
+    import re
+
+    # 1. Remove <think>...</think> blocks (including multiline)
+    text = re.sub(r"<think>[\s\S]*?</think>", "", text, flags=re.IGNORECASE)
+
+    # 2. Remove any line that looks like internal reasoning prose
+    clean_lines = []
+    for line in text.splitlines():
+        stripped = line.strip()
+        lower = stripped.lower()
+        if any(lower.startswith(prefix) for prefix in _REASONING_PREFIXES):
+            continue  # drop this line
+        clean_lines.append(line)
+
+    result = "\n".join(clean_lines).strip()
+
+    # 3. If nothing remains after stripping, return original (better than empty)
+    return result if result else text.strip()
+
 
 # ── Individual provider calls ─────────────────────────────────────────────────
 
@@ -25,7 +64,7 @@ async def _xai_call(messages: list, system: str) -> str:
             },
         )
         r.raise_for_status()
-        return r.json()["choices"][0]["message"]["content"]
+        return _strip_thinking(r.json()["choices"][0]["message"]["content"])
 
 
 async def _openrouter_call(messages: list, system: str) -> str:
@@ -45,7 +84,7 @@ async def _openrouter_call(messages: list, system: str) -> str:
             },
         )
         r.raise_for_status()
-        return r.json()["choices"][0]["message"]["content"]
+        return _strip_thinking(r.json()["choices"][0]["message"]["content"])
 
 
 async def _groq_call(messages: list, system: str) -> str:
@@ -61,7 +100,7 @@ async def _groq_call(messages: list, system: str) -> str:
             },
         )
         r.raise_for_status()
-        return r.json()["choices"][0]["message"]["content"]
+        return _strip_thinking(r.json()["choices"][0]["message"]["content"])
 
 
 async def _ollama_call(messages: list, system: str) -> str:
@@ -76,7 +115,7 @@ async def _ollama_call(messages: list, system: str) -> str:
             },
         )
         r.raise_for_status()
-        return r.json()["message"]["content"]
+        return _strip_thinking(r.json()["message"]["content"])
 
 
 # ── Provider registry ─────────────────────────────────────────────────────────

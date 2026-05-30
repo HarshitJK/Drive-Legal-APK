@@ -1,0 +1,35 @@
+services:
+  # ── Backend (FastAPI) ────────────────────────────────────────────────────────
+  - type: web
+    name: drive-legal-backend
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: XAI_API_KEY
+        sync: false          # set manually in Render dashboard
+      - key: XAI_MODEL
+        value: grok-3
+      - key: OPENROUTER_API_KEY
+        sync: false
+      - key: OPENROUTER_MODEL
+        value: meta-llama/llama-3.3-70b-instruct:free
+      - key: GROQ_API_KEY
+        sync: false
+      - key: GROQ_MODEL
+        value: llama-3.3-70b-versatile
+      - key: WIKI_DIR
+        value: wiki
+      - key: MAX_HISTORY_TURNS
+        value: "6"
+      - key: MAX_WIKI_ARTICLES
+        value: "3"
+      - key: PARIVAHAN_BASE_URL
+        value: https://echallan.parivahan.gov.in
+      - key: DEBUG
+        value: "false"
+      - key: RATE_LIMIT_PER_MINUTE
+        value: "30"
+      - key: SESSION_TTL_SECONDS
+        value: "86400"

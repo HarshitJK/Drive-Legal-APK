@@ -28,6 +28,20 @@ import { motion, AnimatePresence } from "framer-motion";
 import * as React from "react";
 import { api, getOrCreateSessionId, type ChatResponse } from "@/lib/api";
 
+// ── Supported languages ───────────────────────────────────────────────────────
+const LANGUAGES = [
+  { code: "Tamil",     native: "தமிழ்",    flag: "🇮🇳" },
+  { code: "Telugu",    native: "తెలుగు",    flag: "🇮🇳" },
+  { code: "Kannada",   native: "ಕನ್ನಡ",     flag: "🇮🇳" },
+  { code: "Malayalam", native: "മലയാളം",    flag: "🇮🇳" },
+  { code: "Hindi",     native: "हिन्दी",    flag: "🇮🇳" },
+  { code: "Marathi",   native: "मराठी",     flag: "🇮🇳" },
+  { code: "Gujarati",  native: "ગુજરાતી",   flag: "🇮🇳" },
+  { code: "Bengali",   native: "বাংলা",     flag: "🇮🇳" },
+  { code: "Odia",      native: "ଓଡ଼ିଆ",     flag: "🇮🇳" },
+  { code: "English",   native: "English",   flag: "🇬🇧" },
+];
+
 // ── Auto-resize textarea hook ─────────────────────────────────────────────────
 interface UseAutoResizeTextareaProps {
     minHeight: number;
@@ -213,6 +227,8 @@ export function AnimatedAIChat() {
     const [currentTime, setCurrentTime] = useState("");
     const [inputFocused, setInputFocused] = useState(false);
     const [sessionId] = useState(() => getOrCreateSessionId());
+    const [currentLanguage, setCurrentLanguage] = useState("English");
+    const [showLanguageSwitcher, setShowLanguageSwitcher] = useState(false);
 
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const commandPaletteRef = useRef<HTMLDivElement>(null);
@@ -328,6 +344,7 @@ export function AnimatedAIChat() {
             const resp: ChatResponse = await api.sendChat({
                 message: text,
                 session_id: sessionId,
+                language: currentLanguage,
             });
 
             const assistantMsg: Message = {
@@ -354,6 +371,17 @@ export function AnimatedAIChat() {
 
     const isEmpty = messages.length === 0;
 
+    // ── Language switcher handler ───────────────────────────────────────────────
+    const handleSelectLanguage = async (langCode: string) => {
+        setCurrentLanguage(langCode);
+        setShowLanguageSwitcher(false);
+        try {
+            await api.setLanguage(sessionId, langCode);
+        } catch (e) {
+            console.warn("setLanguage failed:", e);
+        }
+    };
+
     return (
         <div className="min-h-screen flex flex-col w-full items-center justify-center bg-transparent text-white p-6 relative overflow-hidden">
             {/* Top Left Badge */}
@@ -367,6 +395,63 @@ export function AnimatedAIChat() {
                     <Clock className="w-3.5 h-3.5 text-[#f5a623]" />
                     <span className="tabular-nums">{currentTime}</span>
                 </div>
+            </div>
+
+            {/* Language Switcher Button — top-right */}
+            <div className="absolute top-6 right-6 z-20">
+                <motion.button
+                    id="language-switcher-btn"
+                    type="button"
+                    onClick={() => setShowLanguageSwitcher(p => !p)}
+                    whileTap={{ scale: 0.94 }}
+                    className="flex items-center gap-1.5 text-[11px] text-white/70 bg-white/[0.02] border border-white/[0.06] backdrop-blur-xl px-3 py-1.5 rounded-full hover:bg-white/[0.06] hover:text-white transition-all select-none"
+                >
+                    <span>{LANGUAGES.find(l => l.code === currentLanguage)?.flag ?? "🌐"}</span>
+                    <span className="font-medium">{currentLanguage}</span>
+                    <svg className="w-3 h-3 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                </motion.button>
+
+                {/* Language switcher modal */}
+                <AnimatePresence>
+                    {showLanguageSwitcher && (
+                        <motion.div
+                            id="language-switcher-modal"
+                            className="absolute right-0 top-10 mt-1 w-52 backdrop-blur-xl bg-black/90 border border-white/10 rounded-xl shadow-2xl z-50 overflow-hidden"
+                            initial={{ opacity: 0, y: -6, scale: 0.97 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: -6, scale: 0.97 }}
+                            transition={{ duration: 0.15 }}
+                        >
+                            <div className="px-3 pt-3 pb-1 text-[10px] uppercase tracking-widest text-white/30 font-semibold">Select Language</div>
+                            <div className="py-1">
+                                {LANGUAGES.map((lang) => (
+                                    <motion.button
+                                        key={lang.code}
+                                        id={`lang-option-${lang.code.toLowerCase()}`}
+                                        type="button"
+                                        onClick={() => handleSelectLanguage(lang.code)}
+                                        whileHover={{ x: 2 }}
+                                        className={cn(
+                                            "w-full flex items-center gap-2.5 px-3 py-2 text-sm transition-colors text-left",
+                                            currentLanguage === lang.code
+                                                ? "bg-[#1a5fa8]/40 text-white"
+                                                : "text-white/70 hover:bg-white/[0.06] hover:text-white"
+                                        )}
+                                    >
+                                        <span className="text-base leading-none">{lang.flag}</span>
+                                        <div className="flex flex-col min-w-0">
+                                            <span className="font-medium text-xs leading-tight">{lang.code}</span>
+                                            <span className="text-[10px] text-white/40 leading-tight truncate">{lang.native}</span>
+                                        </div>
+                                        {currentLanguage === lang.code && (
+                                            <svg className="w-3 h-3 ml-auto text-[#f5a623] flex-shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
+                                        )}
+                                    </motion.button>
+                                ))}
+                            </div>
+                        </motion.div>
+                    )}
+                </AnimatePresence>
             </div>
 
             {/* Ambient glow */}
