@@ -1,6 +1,6 @@
 <h1 align="center">
   <br>
-  🚗 DriveLegal
+    DriveLegal
   <br>
 </h1>
 
@@ -30,11 +30,10 @@
 
 **DriveLegal** is a multilingual, AI-powered chatbot assistant built for Indian drivers. It helps users understand their rights and obligations under the **Motor Vehicles (Amendment) Act 2019**, look up traffic fines by violation type and state, check challans on Parivahan, and get localized legal guidance — all via a sleek web app or a native **Android APK**.
 
-> Built at IIT Hackathon 🏆
 
 ---
 
-## ✨ Features
+## Features
 
 | Feature | Description |
 |---|---|
@@ -219,55 +218,6 @@ http://localhost:8000
 | `GET` | `/language` | Language detection |
 | `POST` | `/whatsapp` | WhatsApp webhook |
 
-### POST `/chat`
-
-```json
-{
-  "session_id": "user-123",
-  "message": "What is the fine for not wearing a helmet in Maharashtra?",
-  "language": "English",
-  "state": "Maharashtra",
-  "city": "Mumbai"
-}
-```
-
-**Response:**
-```json
-{
-  "reply": "The fine for not wearing a helmet in Maharashtra under Section 129...",
-  "language": "English",
-  "session_id": "user-123",
-  "parivahan_link": "https://echallan.parivahan.gov.in/..."
-}
-```
-
-### POST `/calculator`
-
-```json
-{
-  "violation": "helmet",
-  "vehicle_type": "two-wheeler",
-  "state": "Maharashtra",
-  "offense_count": 1
-}
-```
-
-**Response:**
-```json
-{
-  "violation": "helmet",
-  "section": "Section 129, MV Act 2019",
-  "vehicle_type": "two-wheeler",
-  "state": "Maharashtra",
-  "offense": 1,
-  "fine_min": 1000,
-  "fine_max": 1000,
-  "fine_display": "₹1,000",
-  "state_note": null,
-  "parivahan_link": "https://echallan.parivahan.gov.in/..."
-}
-```
-
 ---
 
 ## 🔐 Environment Variables
@@ -353,13 +303,5 @@ DriveLegal auto-detects and responds in:
 - 🇮🇳 Kannada (ಕನ್ನಡ)
 - 🇮🇳 Malayalam (മലയാളം)
 - 🇮🇳 Bengali (বাংলা)
-
 ---
 
-## 📜 License
-
-This project was created for an IIT Hackathon. All rights reserved.
-
----
-
-<p align="center">Made with ❤️ for Indian drivers</p>
